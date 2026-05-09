@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Pembayaran QRIS</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="assets/styles.css" />
+  </head>
+  <body>
+    <div class="bg-orb orb-1"></div>
+    <div class="bg-orb orb-2"></div>
+
+    <header class="site-header container">
+      <a class="btn btn-ghost btn-small" href="Main_Page.html">Kembali ke menu</a>
+      <div class="brand">
+        <span class="brand-mark">MC</span>
+        <div>
+          <p class="brand-title">Mie Chili</p>
+          <p class="brand-tag">Pembayaran QRIS</p>
+        </div>
+      </div>
+    </header>
+
+    <main class="container narrow">
+      <section class="panel reveal">
+        <div class="panel-head">
+          <h1>QRIS</h1>
+          <p>Scan QRIS berikut, lalu kirim riwayat transaksi ke WhatsApp.</p>
+          <p class="muted">Bayar saat barang diterima? pilih Tunai saat pemesanan.</p>
+        </div>
+
+        <div id="qrisSummary" class="summary-grid"></div>
+
+        <div class="payment-grid">
+          <div class="payment-card active">
+            <h3>QRIS</h3>
+            <img
+              src="assets/qris-1136x1600.jpeg"
+              alt="QRIS"
+              class="qris-image"
+              width="1136"
+              height="1600"
+            />
+            <a id="waLink" class="wa-link" href="#" target="_blank" rel="noopener">
+              Bayar? Kirim Riwayat transaksi ke WhatsApp ini
+            </a>
+          </div>
+
+          <div class="payment-card">
+            <h3>Status pembayaran</h3>
+            <p class="muted">Status akan berubah setelah kasir konfirmasi.</p>
+            <a id="statusLink" class="btn btn-ghost btn-small" href="#">
+              Lihat status pembayaran
+            </a>
+          </div>
+        </div>
+
+        <p id="qrisMessage" class="form-message"></p>
+      </section>
+    </main>
+
+    <script>
+      window.WA_NUMBER = "6281234567890";
+    </script>
+    <script src="assets/shared.js"></script>
+    <script src="assets/qris.js"></script>
+  </body>
+</html>

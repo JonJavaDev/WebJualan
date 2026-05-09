@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Preorder</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="assets/styles.css" />
+  </head>
+  <body>
+    <div class="bg-orb orb-1"></div>
+    <div class="bg-orb orb-2"></div>
+
+    <header class="site-header container">
+      <a class="btn btn-ghost btn-small" href="Main_Page.html">Kembali ke menu</a>
+      <div class="brand">
+        <span class="brand-mark">MC</span>
+        <div>
+          <p class="brand-title">Preorder Mie Chili</p>
+          <p class="brand-tag">Langsung terkonfirmasi tanpa antrian</p>
+        </div>
+      </div>
+    </header>
+
+    <main class="container narrow">
+      <section class="panel reveal">
+        <div class="panel-head">
+          <h1>Buat Preorder</h1>
+          <p>Isi data preorder, lalu pesanan langsung dikonfirmasi.</p>
+        </div>
+
+        <div id="preorderSummary" class="item-summary"></div>
+
+        <form id="preorderForm" class="form-grid">
+          <div class="field full">
+            <label for="preorderItem">Pilih menu</label>
+            <select id="preorderItem" name="preorderItem"></select>
+          </div>
+
+          <div class="field">
+            <label for="preorderName">Nama pemesan</label>
+            <input
+              id="preorderName"
+              name="preorderName"
+              type="text"
+              placeholder="Nama kamu"
+              required
+            />
+          </div>
+
+          <div class="field">
+            <label for="preorderQuantity">Jumlah</label>
+            <input
+              id="preorderQuantity"
+              name="preorderQuantity"
+              type="number"
+              min="1"
+              value="1"
+              required
+            />
+          </div>
+
+          <div class="field full">
+            <span class="label">Metode pembayaran</span>
+            <div class="radio-group">
+              <label class="radio">
+                <input type="radio" name="preorderPayment" value="qris" checked />
+                QRIS
+              </label>
+              <label class="radio">
+                <input type="radio" name="preorderPayment" value="cash" />
+                Tunai
+              </label>
+            </div>
+            <p class="muted">Bayar saat barang diterima? pilih Tunai.</p>
+          </div>
+
+          <div class="field total-field full">
+            <span>Total</span>
+            <strong id="preorderTotal">Rp 0</strong>
+          </div>
+
+          <div class="field full">
+            <button id="submitPreorder" class="btn" type="submit">
+              Konfirmasi preorder
+            </button>
+            <p id="preorderMessage" class="form-message"></p>
+          </div>
+        </form>
+      </section>
+    </main>
+
+    <script src="assets/shared.js"></script>
+    <script src="assets/preorder.js"></script>
+  </body>
+</html>

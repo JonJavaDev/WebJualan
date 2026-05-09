@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Nomor Antrian</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="assets/styles.css" />
+  </head>
+  <body>
+    <div class="bg-orb orb-1"></div>
+    <div class="bg-orb orb-2"></div>
+
+    <header class="site-header container">
+      <a class="btn btn-ghost btn-small" href="Main_Page.html">Kembali ke menu</a>
+      <div class="brand">
+        <span class="brand-mark">MC</span>
+        <div>
+          <p class="brand-title">Mie Chili</p>
+          <p class="brand-tag">Nomor antrian pesanan</p>
+        </div>
+      </div>
+    </header>
+
+    <main class="container narrow">
+      <section class="panel reveal">
+        <div class="panel-head">
+          <h1>Nomor Antrian</h1>
+          <p>Pesanan kamu masuk antrian otomatis sesuai urutan.</p>
+        </div>
+
+        <div class="ticket">
+          <span class="ticket-sub">Nomor kamu</span>
+          <div id="ticketNumber" class="ticket-number">-</div>
+          <span id="ticketStatus" class="muted"></span>
+        </div>
+
+        <div id="queueDetails" class="summary-grid"></div>
+
+        <div class="admin-row">
+          <button id="toPaymentBtn" class="btn" type="button">
+            Lanjut ke pembayaran
+          </button>
+          <p id="queueMessage" class="form-message"></p>
+        </div>
+      </section>
+    </main>
+
+    <script src="assets/shared.js"></script>
+    <script src="assets/queue.js"></script>
+  </body>
+</html>
