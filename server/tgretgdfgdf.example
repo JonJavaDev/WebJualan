@@ -4,4 +4,4 @@ DB_NAME=webjualan
 DB_DRIVER=msnodesqlv8
 DB_ENCRYPT=false
 DB_TRUST_CERT=true
-PORT=3000
+PORT=3001

@@ -3,11 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Nomor Antrian</title>
-    <link
-      href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap"
-      rel="stylesheet"
-    />
+    <title>Status Pesanan</title>
     <link rel="stylesheet" href="assets/styles.css" />
   </head>
   <body>
@@ -17,10 +13,16 @@
     <header class="site-header container">
       <a class="btn btn-ghost btn-small" href="Main_Page.html">Kembali ke menu</a>
       <div class="brand">
-        <span class="brand-mark">MC</span>
+        <img
+          class="brand-mark"
+          alt="Logo Mie Chili Oil"
+          src="logo/mie-chili-logo.svg"
+          width="44"
+          height="44"
+        />
         <div>
           <p class="brand-title">Mie Chili</p>
-          <p class="brand-tag">Nomor antrian pesanan</p>
+          <p class="brand-tag">Status pesanan kamu</p>
         </div>
       </div>
     </header>
@@ -28,14 +30,34 @@
     <main class="container narrow">
       <section class="panel reveal">
         <div class="panel-head">
-          <h1>Nomor Antrian</h1>
-          <p>Pesanan kamu masuk antrian otomatis sesuai urutan.</p>
+          <h1>Status Pesanan</h1>
+          <p>Tunjukkan QR ini ke kasir saat mengambil pesanan.</p>
         </div>
 
-        <div class="ticket">
-          <span class="ticket-sub">Nomor kamu</span>
-          <div id="ticketNumber" class="ticket-number">-</div>
-          <span id="ticketStatus" class="muted"></span>
+        <div id="orderProgress" class="progress-card">
+          <div class="progress-header">
+            <p class="progress-label">Progres pesanan</p>
+            <span class="progress-text" data-progress-text>Menunggu pembayaran</span>
+          </div>
+          <div class="progress-track">
+            <div class="progress-bar"></div>
+          </div>
+          <div class="progress-steps">
+            <div class="progress-step">Pesanan dibuat</div>
+            <div class="progress-step">Pembayaran</div>
+            <div class="progress-step">Diproses</div>
+            <div class="progress-step">Siap diambil</div>
+            <div class="progress-step">Selesai</div>
+          </div>
+        </div>
+
+        <div class="qr-panel">
+          <div class="qr-meta">
+            <span class="ticket-sub">Kode pesanan</span>
+            <div id="orderSequence" class="qr-code-number">-</div>
+            <span id="orderStatus" class="muted"></span>
+          </div>
+          <img id="orderQr" class="qr-image" alt="QR pesanan" />
         </div>
 
         <div id="queueDetails" class="summary-grid"></div>

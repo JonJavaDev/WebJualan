@@ -4,10 +4,6 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Preorder</title>
-    <link
-      href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap"
-      rel="stylesheet"
-    />
     <link rel="stylesheet" href="assets/styles.css" />
   </head>
   <body>
@@ -17,7 +13,13 @@
     <header class="site-header container">
       <a class="btn btn-ghost btn-small" href="Main_Page.html">Kembali ke menu</a>
       <div class="brand">
-        <span class="brand-mark">MC</span>
+        <img
+          class="brand-mark"
+          alt="Logo Mie Chili Oil"
+          src="logo/mie-chili-logo.svg"
+          width="44"
+          height="44"
+        />
         <div>
           <p class="brand-title">Preorder Mie Chili</p>
           <p class="brand-tag">Langsung terkonfirmasi tanpa antrian</p>
@@ -32,12 +34,25 @@
           <p>Isi data preorder, lalu pesanan langsung dikonfirmasi.</p>
         </div>
 
-        <div id="preorderSummary" class="item-summary"></div>
+        <div class="cart-panel">
+          <div class="cart-head">
+            <div>
+              <h2>Keranjang preorder</h2>
+              <p class="muted">Cek menu dan jumlah sebelum konfirmasi.</p>
+            </div>
+          </div>
+          <div id="preorderCart" class="cart-list"></div>
+          <div class="cart-total-row">
+            <span>Total</span>
+            <strong id="preorderTotal">Rp 0</strong>
+          </div>
+        </div>
 
         <form id="preorderForm" class="form-grid">
           <div class="field full">
-            <label for="preorderItem">Pilih menu</label>
-            <select id="preorderItem" name="preorderItem"></select>
+            <span class="label">Pilih paket</span>
+            <div id="preorderMenuPicker" class="menu-picker"></div>
+            <p class="muted">Gunakan tombol + dan - untuk mengatur jumlah.</p>
           </div>
 
           <div class="field">
@@ -46,22 +61,65 @@
               id="preorderName"
               name="preorderName"
               type="text"
-              placeholder="Nama kamu"
+              placeholder="Nama lengkap"
               required
             />
+            <p class="muted">Gunakan nama lengkap (nama depan & belakang).</p>
           </div>
 
           <div class="field">
-            <label for="preorderQuantity">Jumlah</label>
+            <label for="preorderPhone">Nomor telepon</label>
             <input
-              id="preorderQuantity"
-              name="preorderQuantity"
-              type="number"
-              min="1"
-              value="1"
+              id="preorderPhone"
+              name="preorderPhone"
+              type="tel"
+              inputmode="numeric"
+              placeholder="08xxxxxxxxxx"
+              maxlength="15"
+              autocomplete="tel"
               required
             />
+            <p class="muted">Masukkan nomor aktif agar mudah dihubungi.</p>
           </div>
+
+          <div class="field">
+            <label for="preorderClass">Kelas</label>
+            <select id="preorderClass" name="preorderClass" required>
+              <option value="" selected disabled>Pilih kelas</option>
+              <option value="11 TKJ 1">11 TKJ 1</option>
+              <option value="11 TKJ 2">11 TKJ 2</option>
+              <option value="11 TKJ 3">11 TKJ 3</option>
+              <option value="11 DKV 1">11 DKV 1</option>
+              <option value="11 DKV 2">11 DKV 2</option>
+              <option value="11 AK">11 AK</option>
+              <option value="11 MP">11 MP</option>
+              <option value="10 TKJ 1">10 TKJ 1</option>
+              <option value="10 TKJ 2">10 TKJ 2</option>
+              <option value="10 TKJ 3">10 TKJ 3</option>
+              <option value="10 TKJ 4">10 TKJ 4</option>
+              <option value="10 DKV">10 DKV</option>
+              <option value="10 MP 1">10 MP 1</option>
+              <option value="10 MP 2">10 MP 2</option>
+              <option value="10 AK">10 AK</option>
+              <option value="Guru">Guru</option>
+            </select>
+            <p class="muted">Jika siswa, pilih kelas. Jika guru, pilih "Guru".</p>
+          </div>
+
+          <div class="field">
+            <label for="preorderLevel">Level</label>
+            <select id="preorderLevel" name="preorderLevel" required>
+              <option value="" selected disabled>Pilih level</option>
+              <option value="0">Level 0</option>
+              <option value="1">Level 1</option>
+              <option value="2">Level 2</option>
+              <option value="3">Level 3</option>
+              <option value="4">Level 4</option>
+              <option value="5">Level 5</option>
+            </select>
+            <p class="muted">Pilih level 0 sampai 5.</p>
+          </div>
+
 
           <div class="field full">
             <span class="label">Metode pembayaran</span>
@@ -78,9 +136,16 @@
             <p class="muted">Bayar saat barang diterima? pilih Tunai.</p>
           </div>
 
-          <div class="field total-field full">
-            <span>Total</span>
-            <strong id="preorderTotal">Rp 0</strong>
+          <div class="field full">
+            <label for="preorderNote">Catatan</label>
+            <textarea
+              id="preorderNote"
+              name="preorderNote"
+              rows="3"
+              maxlength="255"
+              placeholder="Catatan tambahan (opsional)"
+            ></textarea>
+            <p class="muted">Opsional, misalnya tanpa sambal atau pedas sedang.</p>
           </div>
 
           <div class="field full">

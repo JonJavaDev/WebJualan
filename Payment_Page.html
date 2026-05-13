@@ -4,10 +4,6 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Pembayaran</title>
-    <link
-      href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap"
-      rel="stylesheet"
-    />
     <link rel="stylesheet" href="assets/styles.css" />
   </head>
   <body>
@@ -17,7 +13,13 @@
     <header class="site-header container">
       <a class="btn btn-ghost btn-small" href="Main_Page.html">Kembali ke menu</a>
       <div class="brand">
-        <span class="brand-mark">MC</span>
+        <img
+          class="brand-mark"
+          alt="Logo Mie Chili Oil"
+          src="logo/mie-chili-logo.svg"
+          width="44"
+          height="44"
+        />
         <div>
           <p class="brand-title">Mie Chili</p>
           <p class="brand-tag">Konfirmasi pembayaran oleh kasir</p>
@@ -30,6 +32,23 @@
         <div class="panel-head">
           <h1>Pembayaran</h1>
           <p>Ringkasan pesanan. Konfirmasi pembayaran dilakukan di kasir.</p>
+        </div>
+
+        <div id="orderProgress" class="progress-card">
+          <div class="progress-header">
+            <p class="progress-label">Progres pesanan</p>
+            <span class="progress-text" data-progress-text>Menunggu pembayaran</span>
+          </div>
+          <div class="progress-track">
+            <div class="progress-bar"></div>
+          </div>
+          <div class="progress-steps">
+            <div class="progress-step">Pesanan dibuat</div>
+            <div class="progress-step">Pembayaran</div>
+            <div class="progress-step">Diproses</div>
+            <div class="progress-step">Siap diambil</div>
+            <div class="progress-step">Selesai</div>
+          </div>
         </div>
 
         <div id="orderSummary" class="summary-grid"></div>

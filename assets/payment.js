@@ -5,8 +5,16 @@
     statusLabel,
     queueStatusLabel,
     queryParam,
+    isAccessBlocked,
+    formatItemsHtml,
+    sumItemQty,
+    setProgressState,
   } = window.APP;
   const orderId = queryParam("orderId");
+
+  if (isAccessBlocked && isAccessBlocked()) {
+    return;
+  }
 
   const summary = document.getElementById("orderSummary");
   const message = document.getElementById("paymentMessage");
@@ -15,10 +23,41 @@
   const qrisStatus = document.getElementById("qrisStatus");
   const cashStatus = document.getElementById("cashStatus");
   const refreshButton = document.getElementById("refreshStatusBtn");
+  const progressCard = document.getElementById("orderProgress");
+  const progressText = progressCard?.querySelector(".progress-text");
 
   const setMessage = (text, type = "") => {
     message.textContent = text || "";
     message.className = `form-message ${type}`.trim();
+  };
+
+  const getProgressStep = (order) => {
+    if (order.status === "canceled") {
+      return 1;
+    }
+    if (order.status === "pending_qris" || order.status === "pending_cash" || order.status === "pending") {
+      return 2;
+    }
+    if (order.status === "paid") {
+      return 3;
+    }
+    if (order.status === "confirmed") {
+      return 4;
+    }
+    if (order.status === "completed" || order.queueStatus === "served") {
+      return 5;
+    }
+    return 2;
+  };
+
+  const updateProgress = (order) => {
+    if (!progressCard) {
+      return;
+    }
+    setProgressState(progressCard, getProgressStep(order));
+    if (progressText) {
+      progressText.textContent = statusLabel(order.status);
+    }
   };
 
   if (!orderId) {
@@ -30,18 +69,28 @@
   const renderSummary = (order) => {
     const statusClass = order.status === "paid" ? "status-paid" : "status-pending";
     const queueStatusText = queueStatusLabel(order.queueStatus || "waiting");
+    const itemsHtml = formatItemsHtml(order.items || []);
+    const totalItems = sumItemQty(order.items, order.quantity);
     summary.innerHTML = `
       <div class="summary-card">
         <p class="label">Nama</p>
         <p class="value">${order.name}</p>
       </div>
       <div class="summary-card">
-        <p class="label">Menu</p>
-        <p class="value">${order.itemName}</p>
+        <p class="label">Nomor telepon</p>
+        <p class="value">${order.phone || "-"}</p>
       </div>
       <div class="summary-card">
-        <p class="label">Jumlah</p>
-        <p class="value">${order.quantity}</p>
+        <p class="label">Kelas</p>
+        <p class="value">${order.className || "-"}</p>
+      </div>
+      <div class="summary-card full">
+        <p class="label">Daftar item</p>
+        ${itemsHtml}
+      </div>
+      <div class="summary-card">
+        <p class="label">Total item</p>
+        <p class="value">${totalItems}</p>
       </div>
       <div class="summary-card">
         <p class="label">Total</p>
@@ -70,6 +119,7 @@
     cashPanel.classList.toggle("active", !isQris);
     qrisStatus.textContent = isQris ? paymentStatus : "Tidak dipilih";
     cashStatus.textContent = !isQris ? paymentStatus : "Tidak dipilih";
+    updateProgress(order);
 
   };
 

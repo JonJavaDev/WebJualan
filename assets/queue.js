@@ -6,29 +6,86 @@
     queueStatusLabel,
     queryParam,
     navigateWithTransition,
+    isAccessBlocked,
+    formatItemsHtml,
+    sumItemQty,
+    generateQrDataUrl,
+    setProgressState,
   } = window.APP;
   const orderId = queryParam("orderId");
 
-  const ticketNumber = document.getElementById("ticketNumber");
-  const ticketStatus = document.getElementById("ticketStatus");
+  if (isAccessBlocked && isAccessBlocked()) {
+    return;
+  }
+
+  const orderSequence = document.getElementById("orderSequence");
+  const orderStatus = document.getElementById("orderStatus");
+  const orderQr = document.getElementById("orderQr");
   const details = document.getElementById("queueDetails");
   const message = document.getElementById("queueMessage");
   const payButton = document.getElementById("toPaymentBtn");
+  const progressCard = document.getElementById("orderProgress");
+  const progressText = progressCard?.querySelector(".progress-text");
 
   const setMessage = (text, type = "") => {
     message.textContent = text || "";
     message.className = `form-message ${type}`.trim();
   };
 
+  const getProgressStep = (order) => {
+    if (order.status === "canceled") {
+      return 1;
+    }
+    if (order.status === "pending_qris" || order.status === "pending_cash" || order.status === "pending") {
+      return 2;
+    }
+    if (order.status === "paid") {
+      return 3;
+    }
+    if (order.status === "confirmed") {
+      return 4;
+    }
+    if (order.status === "completed" || order.queueStatus === "served") {
+      return 5;
+    }
+    return 2;
+  };
+
+  const updateProgress = (order) => {
+    if (!progressCard) {
+      return;
+    }
+    setProgressState(progressCard, getProgressStep(order));
+    if (progressText) {
+      progressText.textContent = queueStatusLabel(order.queueStatus || "waiting");
+    }
+  };
+
   const render = (order) => {
-    const isPreorder = order.isPreorder;
     const queueStatusText = queueStatusLabel(order.queueStatus || "waiting");
     const paymentStatusText = statusLabel(order.status);
+    const itemsHtml = formatItemsHtml(order.items || []);
+    const totalItems = sumItemQty(order.items, order.quantity);
 
-    ticketNumber.textContent = isPreorder ? "-" : order.queueNumber || "-";
-    ticketStatus.textContent = isPreorder
-      ? "Preorder tidak memakai nomor antrian."
-      : `Status pesanan: ${queueStatusText}`;
+    if (orderSequence) {
+      orderSequence.textContent = order.sequenceNumber
+        ? `#${order.sequenceNumber}`
+        : "-";
+    }
+    if (orderStatus) {
+      orderStatus.textContent = `Status pesanan: ${queueStatusText}`;
+    }
+    if (orderQr) {
+      generateQrDataUrl(order.id)
+        .then((dataUrl) => {
+          if (dataUrl) {
+            orderQr.src = dataUrl;
+          }
+        })
+        .catch(() => {
+          orderQr.removeAttribute("src");
+        });
+    }
 
     const targetUrl =
       order.paymentMethod === "qris"
@@ -45,12 +102,20 @@
         <p class="value">${order.name}</p>
       </div>
       <div class="summary-card">
-        <p class="label">Menu</p>
-        <p class="value">${order.itemName}</p>
+        <p class="label">Nomor telepon</p>
+        <p class="value">${order.phone || "-"}</p>
       </div>
       <div class="summary-card">
-        <p class="label">Jumlah</p>
-        <p class="value">${order.quantity}</p>
+        <p class="label">Kelas</p>
+        <p class="value">${order.className || "-"}</p>
+      </div>
+      <div class="summary-card full">
+        <p class="label">Daftar item</p>
+        ${itemsHtml}
+      </div>
+      <div class="summary-card">
+        <p class="label">Total item</p>
+        <p class="value">${totalItems}</p>
       </div>
       <div class="summary-card">
         <p class="label">Metode</p>
@@ -69,6 +134,8 @@
         <p class="value">${formatRupiah(order.total)}</p>
       </div>
     `;
+
+    updateProgress(order);
   };
 
   const loadOrder = async () => {

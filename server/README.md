@@ -16,4 +16,4 @@ Flow pembeli:
 - Order biasa: Main_Page -> Order_Page -> Queue_Page -> (QRIS: Qris_Payment_Page -> Payment_Page, Tunai: Payment_Page)
 - Preorder: Main_Page -> Preorder_Page -> Preorder_Confirm_Page
 
-Server berjalan di http://localhost:3000
+Server berjalan di http://localhost:3001

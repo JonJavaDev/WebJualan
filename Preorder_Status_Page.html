@@ -31,7 +31,7 @@
       <section class="panel reveal">
         <div class="panel-head">
           <h1>Status Preorder</h1>
-          <p>Lihat ringkasan dan status konfirmasi preorder kamu.</p>
+          <p>Masukkan kode preorder untuk melihat status konfirmasi.</p>
         </div>
 
         <div id="preorderProgress" class="progress-card">
@@ -53,22 +53,51 @@
         <div class="qr-panel">
           <div class="qr-meta">
             <span class="ticket-sub">Kode preorder</span>
-            <div id="preorderConfirmSequence" class="qr-code-number">-</div>
-            <span id="preorderConfirmStatus" class="muted"></span>
+            <div id="preorderSequence" class="qr-code-number">-</div>
+            <span id="preorderStatusNote" class="muted"></span>
           </div>
-          <img id="preorderConfirmQr" class="qr-image" alt="QR preorder" />
+          <img id="preorderQr" class="qr-image" alt="QR preorder" />
         </div>
 
-        <div id="preorderConfirmSummary" class="summary-grid"></div>
+        <form id="preorderLookupForm" class="form-grid">
+          <div class="field full">
+            <label for="preorderIdInput">Kode preorder</label>
+            <input
+              id="preorderIdInput"
+              name="preorderIdInput"
+              type="text"
+              placeholder="Contoh: A1B2C3D4E5"
+              autocomplete="off"
+              spellcheck="false"
+            />
+          </div>
+          <div class="field full">
+            <button class="btn btn-ghost btn-small" type="submit">
+              Cek status
+            </button>
+          </div>
+        </form>
 
-        <div class="admin-row">
-          <a class="btn" href="Preorder_Page.html">Kembali ke preorder</a>
-          <p id="preorderConfirmMessage" class="form-message"></p>
+        <div id="preorderStatusSummary" class="summary-grid"></div>
+        <div id="preorderQrisPanel" class="payment-card hidden">
+          <h3>QRIS</h3>
+          <p class="muted">Scan QRIS jika kamu belum bayar.</p>
+          <img
+            src="assets/qris-1136x1600.jpeg"
+            alt="QRIS"
+            class="qris-image"
+            width="1136"
+            height="1600"
+          />
+        </div>
+        <p id="preorderStatusMessage" class="form-message"></p>
+        <div id="preorderActions" class="admin-row hidden">
+          <a class="btn" href="Preorder_Page.html">Pesan lagi</a>
         </div>
       </section>
     </main>
 
     <script src="assets/shared.js"></script>
-    <script src="assets/preorder-confirm.js"></script>
+    <script src="assets/preorder-status.js"></script>
   </body>
 </html>

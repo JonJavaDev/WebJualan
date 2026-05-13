@@ -1,66 +1,120 @@
 <!doctype html>
 <html lang="id">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Kasir - WebJualan</title>
-    <link
-      href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap"
-      rel="stylesheet"
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Kasir - WebJualan</title>
+<link rel="stylesheet" href="assets/styles.css" />
+
+</head>
+<body>
+
+<div class="bg-orb orb-1"></div>
+<div class="bg-orb orb-2"></div>
+
+<header class="site-header container">
+  <div class="brand">
+    <img
+      class="brand-mark"
+      alt="Logo Mie Chili Oil"
+      src="logo/mie-chili-logo.svg"
+      width="44"
+      height="44"
     />
-    <link rel="stylesheet" href="assets/styles.css" />
-  </head>
-  <body>
-    <div class="bg-orb orb-1"></div>
-    <div class="bg-orb orb-2"></div>
+    <div>
+      <p class="brand-title">Kasir Mie Chili</p>
+      <p class="brand-tag">Konfirmasi pesanan dan pembayaran</p>
+    </div>
+  </div>
+  <a class="btn btn-ghost btn-small" href="Main_Page.html">Menu</a>
+</header>
 
-    <header class="site-header container">
-      <div class="brand">
-        <span class="brand-mark">MC</span>
-        <div>
-          <p class="brand-title">Kasir Mie Chili</p>
-          <p class="brand-tag">Konfirmasi pesanan dan pembayaran</p>
-        </div>
+<main class="container narrow">
+  <section class="panel reveal">
+    <div class="panel-head">
+      <h1>Dashboard Kasir</h1>
+      <p>Halaman ini hanya untuk PC kasir (butuh admin key).</p>
+    </div>
+
+    <div class="admin-panel">
+      <div class="admin-row">
+        <label class="label" for="adminKey">Admin key</label>
+        <input
+          id="adminKey"
+          type="password"
+          placeholder="Masukkan admin key"
+          autocomplete="off"
+        />
+        <button id="saveKeyBtn" class="btn btn-small" type="button">
+          Simpan
+        </button>
+        <button id="clearKeyBtn" class="btn btn-ghost btn-small" type="button">
+          Keluar
+        </button>
       </div>
-      <a class="btn btn-ghost btn-small" href="Main_Page.html">Menu</a>
-    </header>
 
-    <main class="container narrow">
-      <section class="panel reveal">
-        <div class="panel-head">
-          <h1>Dashboard Kasir</h1>
-          <p>Halaman ini hanya untuk PC kasir (butuh admin key).</p>
-        </div>
+      <div class="admin-row">
+        <button id="refreshOrdersBtn" class="btn btn-ghost btn-small" type="button">
+          Refresh daftar
+        </button>
 
-        <div class="admin-panel">
-          <div class="admin-row">
-            <label class="label" for="adminKey">Admin key</label>
-            <input
-              id="adminKey"
-              type="password"
-              placeholder="Masukkan admin key"
-              autocomplete="off"
-            />
-            <button id="saveKeyBtn" class="btn btn-small" type="button">
-              Simpan
-            </button>
-            <button id="clearKeyBtn" class="btn btn-ghost btn-small" type="button">
-              Keluar
-            </button>
-          </div>
-          <div class="admin-row">
-            <button id="refreshOrdersBtn" class="btn btn-ghost btn-small" type="button">
-              Refresh daftar
-            </button>
-            <p id="adminMessage" class="form-message"></p>
-          </div>
-        </div>
+        <p id="adminMessage" class="form-message"></p>
+      </div>
+    </div>
 
-        <div id="orderList" class="order-list"></div>
-      </section>
-    </main>
+    <div class="view-toggle" role="tablist" aria-label="Tampilan pesanan">
+      <button
+        class="btn btn-ghost btn-small active"
+        type="button"
+        data-view="orders"
+        aria-pressed="true"
+      >
+        Pesanan Langsung
+      </button>
+<div
+  id="proofModal"
+  /* ── Handle ?scan=ID atau ?orderId=ID di URL (QR di-scan dari HP) ── */
+  function handleUrlParam() {
+    var params = new URLSearchParams(window.location.search);
+    var id     = params.get('scan') || params.get('orderId');
+    if (!id) return;
 
-    <script src="assets/shared.js"></script>
-    <script src="assets/cashier.js"></script>
-  </body>
+    /* Tunggu cashier.js render list (~1 detik) */
+    setTimeout(function () {
+      var found = highlightOrder(id);
+      if (!found) {
+        /* Coba sekali lagi setelah 2 detik */
+        setTimeout(function () {
+          if (!highlightOrder(id)) {
+            alert('Pesanan #' + id + ' tidak ditemukan. Pastikan sudah login dan klik Refresh.');
+          }
+        }, 2000);
+      }
+    }, 1000);
+  }
+
+  /* ── Event listeners ── */
+  if (scanBtn)  scanBtn.addEventListener('click', openModal);
+  if (closeBtn) closeBtn.addEventListener('click', closeModal);
+
+  /* Klik backdrop → tutup */
+  if (modal) {
+    modal.addEventListener('click', function (e) {
+      if (e.target === modal) closeModal();
+    });
+  }
+
+  /* Escape → tutup */
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && modal && modal.classList.contains('active')) closeModal();
+  });
+
+  /* Cek URL param setelah halaman siap */
+  document.addEventListener('DOMContentLoaded', handleUrlParam);
+
+}());
+</script>
+<!-- ═══════════════════════════════════════════════════ -->
+
+</body>
 </html>
