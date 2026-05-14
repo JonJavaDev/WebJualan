@@ -4,6 +4,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "build": "vite build",
     "start": "concurrently \"npm run dev\" \"npm run start:server\"",
     "start:server": "npm --prefix server run start"
   },
