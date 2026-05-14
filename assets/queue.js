@@ -165,55 +165,7 @@
 
   // Update dashboard statistics
   const updateDashboardStats = async () => {
-    try {
-      // Simulate live queue data with random variations
-      const waitingCount = document.getElementById("waitingCount");
-      const processingCount = document.getElementById("processingCount");
-      const completedCount = document.getElementById("completedCount");
-      const readyCount = document.getElementById("readyCount");
-      const cookingCount = document.getElementById("cookingCount");
-      const queuePosition = document.getElementById("queuePosition");
-      const totalOrders = document.getElementById("totalOrders");
-      
-      if (waitingCount) {
-        const current = parseInt(waitingCount.textContent);
-        const variance = Math.floor((Math.random() - 0.5) * 4);
-        waitingCount.textContent = Math.max(1, current + variance);
-      }
-      if (processingCount) {
-        const current = parseInt(processingCount.textContent);
-        const variance = Math.floor((Math.random() - 0.5) * 3);
-        processingCount.textContent = Math.max(1, current + variance);
-      }
-      if (completedCount) {
-        const current = parseInt(completedCount.textContent);
-        if (Math.random() > 0.6) {
-          completedCount.textContent = current + 1;
-        }
-      }
-      if (readyCount) {
-        const current = parseInt(readyCount.textContent);
-        const variance = Math.floor((Math.random() - 0.5) * 2);
-        readyCount.textContent = Math.max(0, current + variance);
-      }
-      if (cookingCount) {
-        const current = parseInt(cookingCount.textContent);
-        const variance = Math.floor((Math.random() - 0.5) * 2);
-        cookingCount.textContent = Math.max(0, current + variance);
-      }
-      if (queuePosition && orderId) {
-        const position = Math.floor(Math.random() * 15) + 1;
-        queuePosition.textContent = `#${position}`;
-      }
-      if (totalOrders) {
-        const current = parseInt(totalOrders.textContent);
-        if (Math.random() > 0.7) {
-          totalOrders.textContent = current + 1;
-        }
-      }
-    } catch (error) {
-      console.log("Dashboard update skipped");
-    }
+    return;
   };
 
   if (!orderId) {

@@ -2011,12 +2011,23 @@ summary {
   .menu-picker-item,
   .cart-item,
   .order-card {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
   }
 
   .cart-item-price,
   .order-meta {
     text-align: left;
+  }
+
+  .quantity-control.compact {
+    grid-template-columns: 42px minmax(60px, 76px) 42px;
+  }
+
+  .qty-btn {
+    width: 42px;
+    height: 42px;
+    touch-action: manipulation;
   }
 
   .admin-row input {
