@@ -1123,6 +1123,8 @@ summary {
   grid-template-columns: 44px minmax(0, 1fr) 44px;
   gap: 8px;
   align-items: center;
+  position: relative;
+  z-index: 2;
 }
 
 .quantity-control.compact {
@@ -1143,6 +1145,8 @@ summary {
   font-size: 1.15rem;
   font-weight: 700;
   cursor: pointer;
+  position: relative;
+  z-index: 2;
 }
 
 .field {
