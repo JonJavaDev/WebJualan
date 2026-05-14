@@ -86,16 +86,16 @@
             <span style="display: inline-block; width: 8px; height: 8px; background: #5cf2d6; border-radius: 50%; animation: pulse 2s infinite;"></span>
             Status Antrian Real-Time
           </p>
-          <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 12px;">
-            <div style="padding: 12px; background: rgba(124,140,255,0.1); border-radius: 8px; text-align: center;">
+          <div class="queue-status-grid" style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 12px;">
+            <div class="queue-status-card" style="padding: 12px; background: rgba(124,140,255,0.1); border-radius: 8px; text-align: center;">
               <p style="margin: 0; font-size: 0.85rem; opacity: 0.9;">Menunggu</p>
               <p style="margin: 6px 0 0 0; font-size: 1.4rem; font-weight: bold; color: #7c8cff;" id="waitingCount">12</p>
             </div>
-            <div style="padding: 12px; background: rgba(255,138,76,0.1); border-radius: 8px; text-align: center;">
+            <div class="queue-status-card" style="padding: 12px; background: rgba(255,138,76,0.1); border-radius: 8px; text-align: center;">
               <p style="margin: 0; font-size: 0.85rem; opacity: 0.9;">Dalam Proses</p>
               <p style="margin: 6px 0 0 0; font-size: 1.4rem; font-weight: bold; color: #ff8a4c;" id="processingCount">8</p>
             </div>
-            <div style="padding: 12px; background: rgba(92,242,214,0.1); border-radius: 8px; text-align: center;">
+            <div class="queue-status-card" style="padding: 12px; background: rgba(92,242,214,0.1); border-radius: 8px; text-align: center;">
               <p style="margin: 0; font-size: 0.85rem; opacity: 0.9;">Selesai</p>
               <p style="margin: 6px 0 0 0; font-size: 1.4rem; font-weight: bold; color: #5cf2d6;" id="completedCount">24</p>
             </div>

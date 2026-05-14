@@ -2034,6 +2034,10 @@ summary {
     min-width: 0;
     width: 100%;
   }
+
+  .queue-status-grid {
+    grid-template-columns: 1fr !important;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
