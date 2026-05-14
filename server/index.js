@@ -4,7 +4,7 @@ import dotenv from "dotenv";
 import express from "express";
 import multer from "multer";
 import QRCode from "qrcode";
-import sql from "mssql";
+import mysql from "mysql2/promise";
 import path from "path";
 import { fileURLToPath } from "url";
 
@@ -34,41 +34,37 @@ let DB_READY = false;
 function buildDbConfig() {
   const host = process.env.DB_HOST || "localhost";
   const database = process.env.DB_NAME || "webjualan";
-  const port = Number(process.env.DB_PORT) || 1433;
-  const encrypt = String(process.env.DB_ENCRYPT || "false") === "true";
-  const trustCert = String(process.env.DB_TRUST_CERT || "true") === "true";
+  const port = Number(process.env.DB_PORT) || 3306;
   const user = String(process.env.DB_USER || "").trim();
   const password = String(process.env.DB_PASSWORD || "");
 
   const config = {
-    server: host,
+    host,
     port,
     database,
-    options: {
-      encrypt,
-      trustServerCertificate: trustCert,
-    },
-    requestTimeout: 60000,
-    connectionTimeout: 15000,
+    waitForConnections: true,
+    connectionLimit: 10,
+    queueLimit: 0,
   };
 
-  if (user && password) {
+  if (user) {
     config.user = user;
+  }
+  if (password) {
     config.password = password;
-  } else {
-    config.options.trustedConnection = true;
   }
 
   return config;
 }
 
-const pool = new sql.ConnectionPool(buildDbConfig());
+const pool = mysql.createPool(buildDbConfig());
 
 const poolConnect = pool
-  .connect()
-  .then(() => {
+  .getConnection()
+  .then((conn) => {
     DB_READY = true;
     console.log("DB connected");
+    conn.release();
   })
   .catch((err) => {
     DB_READY = false;
