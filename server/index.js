@@ -126,11 +126,11 @@ const generateUniqueCode = async (table, column, length) => {
   await poolConnect;
   for (let attempt = 0; attempt < 5; attempt += 1) {
     const code = generateCode(length);
-    const exists = await pool
-      .request()
-      .input("code", sql.NVarChar(length), code)
-      .query(`SELECT 1 AS found FROM ${table} WHERE ${column} = @code`);
-    if (!exists.recordset.length) {
+    const [rows] = await pool.execute(
+      `SELECT 1 AS found FROM ${table} WHERE ${column} = ?`,
+      [code]
+    );
+    if (!rows.length) {
       return code;
     }
   }
@@ -297,11 +297,10 @@ const isPreorderExpired = (preorder) => {
 
 const cancelPreorder = async (id) => {
   await poolConnect;
-  await pool
-    .request()
-    .input("status", sql.NVarChar(20), PREORDER_STATUS.canceled)
-    .input("id", sql.Int, id)
-    .query("UPDATE preorders SET status = @status WHERE id = @id");
+  await pool.execute(
+    "UPDATE preorders SET status = ? WHERE id = ?",
+    [PREORDER_STATUS.canceled, id]
+  );
 };
 
 const expireStalePreorders = async () => {
@@ -309,15 +308,10 @@ const expireStalePreorders = async () => {
     return;
   }
   await poolConnect;
-  await pool
-    .request()
-    .input("pending", sql.NVarChar(20), PREORDER_STATUS.pending)
-    .input("canceled", sql.NVarChar(20), PREORDER_STATUS.canceled)
-    .input("method", sql.NVarChar(10), "qris")
-    .input("minutes", sql.Int, PREORDER_EXPIRE_MINUTES)
-    .query(
-      "UPDATE preorders SET status = @canceled WHERE status = @pending AND payment_method = @method AND payment_proof IS NULL AND DATEADD(minute, @minutes, created_at) < SYSUTCDATETIME()"
-    );
+  await pool.execute(
+    "UPDATE preorders SET status = ? WHERE status = ? AND payment_method = ? AND payment_proof IS NULL AND DATE_ADD(created_at, INTERVAL ? MINUTE) < NOW()",
+    [PREORDER_STATUS.canceled, PREORDER_STATUS.pending, "qris", PREORDER_EXPIRE_MINUTES]
+  );
 };
 
 const requireAdminKey = (req, res, next) => {
@@ -439,58 +433,54 @@ const normalizePreorderPublic = (row) => {
 
 const getOrderById = async (id) => {
   await poolConnect;
-  const result = await pool
-    .request()
-    .input("id", sql.Int, id)
-    .query("SELECT * FROM orders WHERE id = @id");
-  return result.recordset[0] || null;
+  const [rows] = await pool.execute(
+    "SELECT * FROM orders WHERE id = ?",
+    [id]
+  );
+  return rows[0] || null;
 };
 
 const getOrderByPublicId = async (publicId) => {
   await poolConnect;
-  const result = await pool
-    .request()
-    .input("publicId", sql.NVarChar(12), publicId)
-    .query("SELECT * FROM orders WHERE public_id = @publicId");
-  return result.recordset[0] || null;
+  const [rows] = await pool.execute(
+    "SELECT * FROM orders WHERE public_id = ?",
+    [publicId]
+  );
+  return rows[0] || null;
 };
 
 const getPreorderById = async (id) => {
   await poolConnect;
-  const result = await pool
-    .request()
-    .input("id", sql.Int, id)
-    .query("SELECT * FROM preorders WHERE id = @id");
-  return result.recordset[0] || null;
+  const [rows] = await pool.execute(
+    "SELECT * FROM preorders WHERE id = ?",
+    [id]
+  );
+  return rows[0] || null;
 };
 
 const getPreorderByPublicId = async (publicId) => {
   await poolConnect;
-  const result = await pool
-    .request()
-    .input("publicId", sql.NVarChar(12), publicId)
-    .query("SELECT * FROM preorders WHERE public_id = @publicId");
-  return result.recordset[0] || null;
+  const [rows] = await pool.execute(
+    "SELECT * FROM preorders WHERE public_id = ?",
+    [publicId]
+  );
+  return rows[0] || null;
 };
 
 const getActivePreorderByIdentity = async (name, className) => {
   await poolConnect;
-  const result = await pool
-    .request()
-    .input("name", sql.NVarChar(100), name)
-    .input("className", sql.NVarChar(50), className)
-    .input("pending", sql.NVarChar(20), PREORDER_STATUS.pending)
-    .query(
-      "SELECT TOP 1 * FROM preorders WHERE name = @name AND class_name = @className AND status = @pending ORDER BY created_at DESC"
-    );
-  return result.recordset[0] || null;
+  const [rows] = await pool.execute(
+    "SELECT * FROM preorders WHERE name = ? AND class_name = ? AND status = ? ORDER BY created_at DESC LIMIT 1",
+    [name, className, PREORDER_STATUS.pending]
+  );
+  return rows[0] || null;
 };
 
-const getNextQueueNumber = async (transaction) => {
-  const result = await new sql.Request(transaction).query(
-    "SELECT ISNULL(MAX(queue_number), 0) + 1 AS nextQueue FROM orders WITH (UPDLOCK, HOLDLOCK) WHERE queue_number IS NOT NULL"
+const getNextQueueNumber = async (conn) => {
+  const [rows] = await conn.execute(
+    "SELECT COALESCE(MAX(queue_number), 0) + 1 AS nextQueue FROM orders WHERE queue_number IS NOT NULL"
   );
-  return result.recordset[0].nextQueue;
+  return rows[0].nextQueue;
 };
 
 app.get("/api/health", (req, res) => {
@@ -579,43 +569,29 @@ app.post("/api/orders", async (req, res) => {
     const queueCode = await generateUniqueCode("orders", "queue_code", 6);
 
     await poolConnect;
-    const transaction = new sql.Transaction(pool);
-    await transaction.begin();
+    const conn = await pool.getConnection();
+    await conn.beginTransaction();
 
     try {
-      const nextQueue = await getNextQueueNumber(transaction);
-      const result = await new sql.Request(transaction)
-        .input("name", sql.NVarChar(100), name)
-        .input("phone", sql.NVarChar(20), phone)
-        .input("className", sql.NVarChar(50), className)
-        .input("itemId", sql.NVarChar(50), primaryItemId)
-        .input("itemName", sql.NVarChar(100), summaryName)
-        .input("price", sql.Int, primaryPrice)
-        .input("quantity", sql.Int, totalItems)
-        .input("itemsJson", sql.NVarChar(sql.MAX), itemsJson)
-        .input("paymentMethod", sql.NVarChar(10), paymentMethod)
-        .input("total", sql.Int, total)
-        .input("status", sql.NVarChar(20), status)
-        .input("queueNumber", sql.Int, nextQueue)
-        .input("queueStatus", sql.NVarChar(20), "waiting")
-        .input("isPreorder", sql.Bit, 0)
-        .input("publicId", sql.NVarChar(12), publicId)
-        .input("queueCode", sql.NVarChar(8), queueCode)
-        .query(
-          "INSERT INTO orders (public_id, name, phone, class_name, item_id, item_name, price, quantity, items_json, payment_method, total, status, queue_number, queue_code, queue_status, is_preorder) OUTPUT Inserted.id, Inserted.queue_number, Inserted.queue_code VALUES (@publicId, @name, @phone, @className, @itemId, @itemName, @price, @quantity, @itemsJson, @paymentMethod, @total, @status, @queueNumber, @queueCode, @queueStatus, @isPreorder)"
-        );
+      const nextQueue = await getNextQueueNumber(conn);
+      const [result] = await conn.execute(
+        "INSERT INTO orders (public_id, name, phone, class_name, item_id, item_name, price, quantity, items_json, payment_method, total, status, queue_number, queue_code, queue_status, is_preorder) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+        [publicId, name, phone, className, primaryItemId, summaryName, primaryPrice, totalItems, itemsJson, paymentMethod, total, status, nextQueue, queueCode, "waiting", 0]
+      );
 
-      await transaction.commit();
+      await conn.commit();
+      conn.release();
 
       return res.json({
         id: publicId,
         total,
         status,
         paymentMethod,
-        sequenceNumber: result.recordset[0].id,
+        sequenceNumber: result.insertId,
       });
     } catch (error) {
-      await transaction.rollback();
+      await conn.rollback();
+      conn.release();
       throw error;
     }
   } catch (error) {
@@ -696,32 +672,17 @@ app.post("/api/preorders", async (req, res) => {
     const publicId = await generateUniqueCode("preorders", "public_id", 10);
 
     await poolConnect;
-    const result = await pool
-      .request()
-      .input("name", sql.NVarChar(100), name)
-      .input("phone", sql.NVarChar(20), phone)
-      .input("className", sql.NVarChar(50), className)
-      .input("level", sql.Int, level)
-      .input("note", sql.NVarChar(255), note || null)
-      .input("itemId", sql.NVarChar(50), primaryItemId)
-      .input("itemName", sql.NVarChar(100), summaryName)
-      .input("price", sql.Int, primaryPrice)
-      .input("quantity", sql.Int, totalItems)
-      .input("itemsJson", sql.NVarChar(sql.MAX), itemsJson)
-      .input("paymentMethod", sql.NVarChar(10), paymentMethod)
-      .input("total", sql.Int, total)
-      .input("status", sql.NVarChar(20), status)
-      .input("publicId", sql.NVarChar(12), publicId)
-      .query(
-        "INSERT INTO preorders (public_id, name, phone, class_name, [level], note, item_id, item_name, price, quantity, items_json, payment_method, total, status) OUTPUT Inserted.id VALUES (@publicId, @name, @phone, @className, @level, @note, @itemId, @itemName, @price, @quantity, @itemsJson, @paymentMethod, @total, @status)"
-      );
+    const [result] = await pool.execute(
+      "INSERT INTO preorders (public_id, name, phone, class_name, `level`, note, item_id, item_name, price, quantity, items_json, payment_method, total, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+      [publicId, name, phone, className, level, note || null, primaryItemId, summaryName, primaryPrice, totalItems, itemsJson, paymentMethod, total, status]
+    );
 
     return res.json({
       id: publicId,
       total,
       status,
       paymentMethod,
-      sequenceNumber: result.recordset[0].id,
+      sequenceNumber: result.insertId,
     });
   } catch (error) {
     console.error("Failed to create preorder:", error);
@@ -800,16 +761,10 @@ app.post(
 
       await poolConnect;
       const uploadedAt = new Date();
-      await pool
-        .request()
-        .input("proof", sql.VarBinary(sql.MAX), req.file.buffer)
-        .input("proofType", sql.NVarChar(100), req.file.mimetype)
-        .input("proofName", sql.NVarChar(255), req.file.originalname)
-        .input("uploadedAt", sql.DateTime2, uploadedAt)
-        .input("id", sql.Int, preorder.id)
-        .query(
-          "UPDATE preorders SET payment_proof = @proof, payment_proof_type = @proofType, payment_proof_name = @proofName, payment_proof_uploaded_at = @uploadedAt WHERE id = @id"
-        );
+      await pool.execute(
+        "UPDATE preorders SET payment_proof = ?, payment_proof_type = ?, payment_proof_name = ?, payment_proof_uploaded_at = ? WHERE id = ?",
+        [req.file.buffer, req.file.mimetype, req.file.originalname, uploadedAt, preorder.id]
+      );
 
       return res.json({ status: "uploaded", uploadedAt });
     } catch (error) {
@@ -845,18 +800,18 @@ app.get("/api/admin/orders", requireAdminKey, async (req, res) => {
     const statusFilter = String(req.query.status || "").trim();
     await poolConnect;
 
-    const request = pool.request();
     let query = "SELECT * FROM orders";
+    const params = [];
 
     if (statusFilter) {
-      request.input("status", sql.NVarChar(20), statusFilter);
-      query += " WHERE status = @status";
+      query += " WHERE status = ?";
+      params.push(statusFilter);
     }
 
     query += " ORDER BY created_at DESC";
-    const result = await request.query(query);
+    const [rows] = await pool.execute(query, params);
 
-    return res.json(result.recordset.map(normalizeOrder));
+    return res.json(rows.map(normalizeOrder));
   } catch (error) {
     console.error("Failed to list orders:", error);
     return res.status(500).json({ error: "Gagal memuat daftar pesanan." });
@@ -869,20 +824,19 @@ app.get("/api/admin/preorders", requireAdminKey, async (req, res) => {
     await expireStalePreorders();
     await poolConnect;
 
-    const request = pool.request();
-    request.input("canceled", sql.NVarChar(20), PREORDER_STATUS.canceled);
     let query =
-      "SELECT id, public_id, name, phone, class_name, [level] AS level, note, item_id, item_name, price, quantity, items_json, payment_method, total, status, created_at, payment_proof_name, payment_proof_uploaded_at, CASE WHEN payment_proof IS NULL THEN 0 ELSE 1 END AS payment_proof_available FROM preorders WHERE status <> @canceled";
+      "SELECT id, public_id, name, phone, class_name, `level` AS level, note, item_id, item_name, price, quantity, items_json, payment_method, total, status, created_at, payment_proof_name, payment_proof_uploaded_at, CASE WHEN payment_proof IS NULL THEN 0 ELSE 1 END AS payment_proof_available FROM preorders WHERE status <> ?";
+    const params = [PREORDER_STATUS.canceled];
 
     if (statusFilter) {
-      request.input("status", sql.NVarChar(20), statusFilter);
-      query += " AND status = @status";
+      query += " AND status = ?";
+      params.push(statusFilter);
     }
 
     query += " ORDER BY created_at DESC";
-    const result = await request.query(query);
+    const [rows] = await pool.execute(query, params);
 
-    return res.json(result.recordset.map(normalizePreorder));
+    return res.json(rows.map(normalizePreorder));
   } catch (error) {
     console.error("Failed to list preorders:", error);
     return res.status(500).json({ error: "Gagal memuat daftar preorder." });
@@ -900,14 +854,12 @@ app.get(
       }
 
       await poolConnect;
-      const result = await pool
-        .request()
-        .input("id", sql.Int, id)
-        .query(
-          "SELECT public_id, name, payment_proof, payment_proof_type, payment_proof_name, payment_proof_uploaded_at FROM preorders WHERE id = @id"
-        );
+      const [rows] = await pool.execute(
+        "SELECT public_id, name, payment_proof, payment_proof_type, payment_proof_name, payment_proof_uploaded_at FROM preorders WHERE id = ?",
+        [id]
+      );
 
-      const row = result.recordset[0];
+      const row = rows[0];
       if (!row) {
         return res.status(404).json({ error: "Preorder tidak ditemukan." });
       }
@@ -947,11 +899,10 @@ app.post("/api/admin/orders/:id/mark-paid", requireAdminKey, async (req, res) =>
 
     if (order.status !== "paid") {
       await poolConnect;
-      await pool
-        .request()
-        .input("status", sql.NVarChar(20), "paid")
-        .input("id", sql.Int, id)
-        .query("UPDATE orders SET status = @status WHERE id = @id");
+      await pool.execute(
+        "UPDATE orders SET status = ? WHERE id = ?",
+        ["paid", id]
+      );
     }
 
     return res.json({ status: "paid" });
@@ -978,11 +929,10 @@ app.post(
 
       if (order.queue_status !== "served") {
         await poolConnect;
-        await pool
-          .request()
-          .input("queueStatus", sql.NVarChar(20), "served")
-          .input("id", sql.Int, id)
-          .query("UPDATE orders SET queue_status = @queueStatus WHERE id = @id");
+        await pool.execute(
+          "UPDATE orders SET queue_status = ? WHERE id = ?",
+          ["served", id]
+        );
       }
 
       return res.json({ queueStatus: "served" });
@@ -1010,11 +960,10 @@ app.post(
 
       if (preorder.status !== PREORDER_STATUS.confirmed) {
         await poolConnect;
-        await pool
-          .request()
-          .input("status", sql.NVarChar(20), PREORDER_STATUS.confirmed)
-          .input("id", sql.Int, id)
-          .query("UPDATE preorders SET status = @status WHERE id = @id");
+        await pool.execute(
+          "UPDATE preorders SET status = ? WHERE id = ?",
+          [PREORDER_STATUS.confirmed, id]
+        );
       }
 
       return res.json({ status: PREORDER_STATUS.confirmed });
@@ -1044,11 +993,10 @@ app.post(
 
       if (preorder.status !== PREORDER_STATUS.completed) {
         await poolConnect;
-        await pool
-          .request()
-          .input("status", sql.NVarChar(20), PREORDER_STATUS.completed)
-          .input("id", sql.Int, id)
-          .query("UPDATE preorders SET status = @status WHERE id = @id");
+        await pool.execute(
+          "UPDATE preorders SET status = ? WHERE id = ?",
+          [PREORDER_STATUS.completed, id]
+        );
       }
 
       return res.json({ status: PREORDER_STATUS.completed });
@@ -1066,29 +1014,26 @@ app.post("/api/admin/cleanup-test-orders", requireAdminKey, async (req, res) => 
     await poolConnect;
 
     // Only keep exact name matches for raffi darmawan and Elfara Dwi Adyastalita
-    const toDelete = await pool
-      .request()
-      .query(`
-        SELECT id FROM preorders
-        WHERE LOWER(name) NOT IN (LOWER('raffi darmawan'), LOWER('Elfara Dwi Adyastalita'))
-      `);
+    const [toDelete] = await pool.execute(`
+      SELECT id FROM preorders
+      WHERE LOWER(name) NOT IN (LOWER('raffi darmawan'), LOWER('Elfara Dwi Adyastalita'))
+    `);
 
-    const deleteIds = toDelete.recordset.map((r) => r.id);
+    const deleteIds = toDelete.map((r) => r.id);
     let deletedCount = 0;
 
     if (deleteIds.length > 0) {
       // Delete the test data
-      const deleteQuery = `DELETE FROM preorders WHERE id IN (${deleteIds.join(",")})`;
-      const result = await pool.request().query(deleteQuery);
-      deletedCount = result.rowsAffected[0] || 0;
+      const placeholders = deleteIds.map(() => "?").join(",");
+      const deleteQuery = `DELETE FROM preorders WHERE id IN (${placeholders})`;
+      const result = await pool.execute(deleteQuery, deleteIds);
+      deletedCount = result.affectedRows || 0;
     }
 
     // Get remaining count
-    const remaining = await pool
-      .request()
-      .query("SELECT COUNT(*) as count FROM preorders");
+    const [remaining] = await pool.execute("SELECT COUNT(*) as count FROM preorders");
 
-    const remainingCount = remaining.recordset[0]?.count || 0;
+    const remainingCount = remaining[0]?.count || 0;
 
     return res.json({
       deleted: deletedCount,
