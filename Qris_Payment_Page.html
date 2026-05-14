@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Pembayaran QRIS</title>
+    <link rel="stylesheet" href="assets/styles.css" />
+  </head>
+  <body>
+    <div class="bg-orb orb-1"></div>
+    <div class="bg-orb orb-2"></div>
+
+    <header class="site-header container">
+      <a class="btn btn-ghost btn-small" href="Preorder_Page.html">Kembali ke preorder</a>
+      <div class="brand">
+        <img
+          class="brand-mark"
+          alt="Logo Mie Chili Oil"
+          src="logo/mie-chili-logo.svg"
+          width="44"
+          height="44"
+        />
+        <div>
+          <p class="brand-title">Mie Chili</p>
+          <p class="brand-tag">Pembayaran QRIS</p>
+        </div>
+      </div>
+    </header>
+
+    <main class="container narrow">
+      <section class="panel reveal">
+        <div class="panel-head">
+          <h1>QRIS</h1>
+          <p>Scan QRIS berikut, lalu unggah bukti pembayaran.</p>
+          <p class="muted">Bayar saat barang diterima? pilih Tunai saat pemesanan.</p>
+        </div>
+
+        <div id="preorderProgress" class="progress-card">
+          <div class="progress-header">
+            <p class="progress-label">Progres preorder</p>
+            <span class="progress-text" data-progress-text>Menunggu konfirmasi</span>
+          </div>
+          <div class="progress-track">
+            <div class="progress-bar"></div>
+          </div>
+          <div class="progress-steps">
+            <div class="progress-step">Preorder dibuat</div>
+            <div class="progress-step">Menunggu konfirmasi</div>
+            <div class="progress-step">Dikonfirmasi</div>
+            <div class="progress-step">Selesai</div>
+          </div>
+        </div>
+
+        <div id="qrisSummary" class="summary-grid"></div>
+
+        <div class="payment-grid">
+          <div class="payment-card active">
+            <h3>QRIS</h3>
+            <img
+              src="assets/qris-1136x1600.jpeg"
+              alt="QRIS"
+              class="qris-image"
+              width="1136"
+              height="1600"
+            />
+            <div class="upload-panel">
+              <p class="label">Unggah bukti pembayaran</p>
+              <div class="upload-row">
+                <input
+                  id="qrisProofInput"
+                  class="file-input"
+                  type="file"
+                  accept="image/*"
+                />
+                <button id="qrisProofButton" class="btn btn-small" type="button">
+                  Pilih bukti
+                </button>
+              </div>
+              <p id="qrisProofName" class="muted">Belum ada file dipilih.</p>
+              <p id="qrisProofStatus" class="muted"></p>
+              <div class="upload-progress">
+                <div class="upload-track">
+                  <div id="qrisUploadBar" class="upload-bar"></div>
+                </div>
+                <div class="upload-meta">
+                  <span id="qrisUploadState"></span>
+                  <span id="qrisUploadPercent">0%</span>
+                </div>
+              </div>
+            </div>
+            <a
+              id="waLink"
+              class="wa-link disabled"
+              href="#"
+              target="_blank"
+              rel="noopener"
+              aria-disabled="true"
+            >
+              Kirim bukti via WhatsApp (dinonaktifkan)
+            </a>
+            <a class="btn btn-ghost btn-small" href="Preorder_Page.html">
+              Pesan lagi
+            </a>
+          </div>
+
+          <div class="payment-card">
+            <h3>Status preorder</h3>
+            <p class="muted">Status akan berubah setelah kasir konfirmasi.</p>
+            <a id="statusLink" class="btn btn-ghost btn-small" href="#">
+              Lihat status preorder
+            </a>
+          </div>
+        </div>
+
+        <p id="qrisMessage" class="form-message"></p>
+      </section>
+    </main>
+
+    <script>
+      window.WA_NUMBER = "085813241941";
+    </script>
+    <script src="assets/shared.js"></script>
+    <script src="assets/qris.js"></script>
+  </body>
+</html>

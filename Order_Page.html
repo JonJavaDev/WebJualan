@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Buat Pesanan</title>
+    <link rel="stylesheet" href="assets/styles.css" />
+  </head>
+  <body>
+    <div class="bg-orb orb-1"></div>
+    <div class="bg-orb orb-2"></div>
+
+    <header class="site-header container">
+      <a class="btn btn-ghost btn-small" href="Main_Page.html">Kembali ke menu</a>
+      <div class="brand">
+        <img
+          class="brand-mark"
+          alt="Logo Mie Chili Oil"
+          src="logo/mie-chili-logo.svg"
+          width="44"
+          height="44"
+        />
+        <div>
+          <p class="brand-title">Mie Chili</p>
+          <p class="brand-tag">Pesan cepat, bayar mudah</p>
+        </div>
+      </div>
+    </header>
+
+    <main class="container narrow">
+      <section class="panel reveal">
+        <div class="panel-head">
+          <h1>Buat Pesanan</h1>
+          <p>Isi data pesanan, pilih pembayaran, lalu dapatkan QR pesanan.</p>
+        </div>
+
+        <div class="cart-panel">
+          <div class="cart-head">
+            <div>
+              <h2>Keranjang pesanan</h2>
+              <p class="muted">Tambahkan paket sebanyak yang kamu mau.</p>
+            </div>
+          </div>
+          <div id="orderCart" class="cart-list"></div>
+          <div class="cart-total-row">
+            <span>Total</span>
+            <strong id="orderTotal">Rp 0</strong>
+          </div>
+        </div>
+
+        <form id="orderForm" class="form-grid">
+          <div class="field">
+            <label for="customerName">Nama pemesan</label>
+            <input
+              id="customerName"
+              name="customerName"
+              type="text"
+              placeholder="Nama lengkap"
+              required
+            />
+            <p class="muted">Gunakan nama lengkap (nama depan & belakang).</p>
+          </div>
+
+          <div class="field">
+            <label for="customerPhone">Nomor telepon</label>
+            <input
+              id="customerPhone"
+              name="customerPhone"
+              type="tel"
+              inputmode="numeric"
+              placeholder="08xxxxxxxxxx"
+              maxlength="15"
+              autocomplete="tel"
+              required
+            />
+            <p class="muted">Masukkan nomor aktif agar mudah dihubungi.</p>
+          </div>
+
+          <div class="field">
+            <label for="customerClass">Kelas</label>
+            <select id="customerClass" name="customerClass" required>
+              <option value="" selected disabled>Pilih kelas</option>
+              <option value="11 TKJ 1">11 TKJ 1</option>
+              <option value="11 TKJ 2">11 TKJ 2</option>
+              <option value="11 TKJ 3">11 TKJ 3</option>
+              <option value="11 DKV 1">11 DKV 1</option>
+              <option value="11 DKV 2">11 DKV 2</option>
+              <option value="11 AK">11 AK</option>
+              <option value="11 MP">11 MP</option>
+              <option value="10 TKJ 1">10 TKJ 1</option>
+              <option value="10 TKJ 2">10 TKJ 2</option>
+              <option value="10 TKJ 3">10 TKJ 3</option>
+              <option value="10 TKJ 4">10 TKJ 4</option>
+              <option value="10 DKV">10 DKV</option>
+              <option value="10 MP 1">10 MP 1</option>
+              <option value="10 MP 2">10 MP 2</option>
+              <option value="10 AK">10 AK</option>
+              <option value="Guru">Guru</option>
+            </select>
+            <p class="muted">Jika siswa, pilih kelas. Jika guru, pilih "Guru".</p>
+          </div>
+
+          <div class="field full">
+            <span class="label">Pilih paket</span>
+            <div id="orderMenuPicker" class="menu-picker"></div>
+            <p class="muted">Gunakan tombol + dan - untuk mengatur jumlah.</p>
+          </div>
+
+          <div class="field full">
+            <span class="label">Metode pembayaran</span>
+            <div class="radio-group">
+              <label class="radio">
+                <input type="radio" name="paymentMethod" value="qris" checked />
+                QRIS
+              </label>
+              <label class="radio">
+                <input type="radio" name="paymentMethod" value="cash" />
+                Tunai
+              </label>
+            </div>
+            <p class="muted">Bayar saat barang diterima? pilih Tunai.</p>
+          </div>
+
+          <div class="field full">
+            <button id="submitOrder" class="btn" type="submit">
+              Buat pesanan
+            </button>
+            <p id="formMessage" class="form-message"></p>
+          </div>
+        </form>
+      </section>
+    </main>
+
+    <script src="assets/shared.js"></script>
+    <script src="assets/order.js"></script>
+  </body>
+</html>

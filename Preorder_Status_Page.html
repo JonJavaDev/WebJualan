@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Status Preorder</title>
+    <link rel="stylesheet" href="assets/styles.css" />
+  </head>
+  <body>
+    <div class="bg-orb orb-1"></div>
+    <div class="bg-orb orb-2"></div>
+
+    <header class="site-header container">
+      <a class="btn btn-ghost btn-small" href="Preorder_Page.html">Kembali ke preorder</a>
+      <div class="brand">
+        <img
+          class="brand-mark"
+          alt="Logo Mie Chili Oil"
+          src="logo/mie-chili-logo.svg"
+          width="44"
+          height="44"
+        />
+        <div>
+          <p class="brand-title">Preorder Mie Chili</p>
+          <p class="brand-tag">Pantau status preorder kamu</p>
+        </div>
+      </div>
+    </header>
+
+    <main class="container narrow">
+      <section class="panel reveal">
+        <div class="panel-head">
+          <h1>Status Preorder</h1>
+          <p>Masukkan kode preorder untuk melihat status konfirmasi.</p>
+        </div>
+
+        <div id="preorderProgress" class="progress-card">
+          <div class="progress-header">
+            <p class="progress-label">Progres preorder</p>
+            <span class="progress-text" data-progress-text>Menunggu konfirmasi</span>
+          </div>
+          <div class="progress-track">
+            <div class="progress-bar"></div>
+          </div>
+          <div class="progress-steps">
+            <div class="progress-step">Preorder dibuat</div>
+            <div class="progress-step">Menunggu konfirmasi</div>
+            <div class="progress-step">Dikonfirmasi</div>
+            <div class="progress-step">Selesai</div>
+          </div>
+        </div>
+
+        <div class="qr-panel">
+          <div class="qr-meta">
+            <span class="ticket-sub">Kode preorder</span>
+            <div id="preorderSequence" class="qr-code-number">-</div>
+            <span id="preorderStatusNote" class="muted"></span>
+          </div>
+          <img id="preorderQr" class="qr-image" alt="QR preorder" />
+        </div>
+
+        <form id="preorderLookupForm" class="form-grid">
+          <div class="field full">
+            <label for="preorderIdInput">Kode preorder</label>
+            <input
+              id="preorderIdInput"
+              name="preorderIdInput"
+              type="text"
+              placeholder="Contoh: A1B2C3D4E5"
+              autocomplete="off"
+              spellcheck="false"
+            />
+          </div>
+          <div class="field full">
+            <button class="btn btn-ghost btn-small" type="submit">
+              Cek status
+            </button>
+          </div>
+        </form>
+
+        <div id="preorderStatusSummary" class="summary-grid"></div>
+        <div id="preorderQrisPanel" class="payment-card hidden">
+          <h3>QRIS</h3>
+          <p class="muted">Scan QRIS jika kamu belum bayar.</p>
+          <img
+            src="assets/qris-1136x1600.jpeg"
+            alt="QRIS"
+            class="qris-image"
+            width="1136"
+            height="1600"
+          />
+        </div>
+        <p id="preorderStatusMessage" class="form-message"></p>
+        <div id="preorderActions" class="admin-row hidden">
+          <a class="btn" href="Preorder_Page.html">Pesan lagi</a>
+        </div>
+      </section>
+    </main>
+
+    <script src="assets/shared.js"></script>
+    <script src="assets/preorder-status.js"></script>
+  </body>
+</html>
